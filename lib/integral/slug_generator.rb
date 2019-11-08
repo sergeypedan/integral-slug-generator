@@ -69,7 +69,6 @@ module Integral
     end
 
     def slugify_full_name(text)
-      Cyrillizer.alphabet = Rails.root.join('lib', 'cyrillizer', 'russian.yml')
       text.gsub(/\s/, @separator).gsub(/_/, @separator).downcase.to_lat
     end
 
