@@ -52,7 +52,7 @@ module Integral
       return slugified if slug_ok?(slugified)
 
       loop do
-        candidate = [text, @generator.call].join(@separator)
+        candidate = [slugified, @generator.call].join(@separator)
         break candidate if slug_ok?(candidate)
       end
     end
