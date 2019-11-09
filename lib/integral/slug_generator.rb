@@ -1,24 +1,23 @@
 # frozen_string_literal: true
 
 require "integral/slug_generator/version"
+
 require "cyrillizer"
 require "securerandom"
 
 module Integral
-  module SlugGenerator
-    class Error < StandardError; end
+  class SlugGenerator
 
-    require "securerandom"
-    require "i18n"
+    Cyrillizer.alphabet = File.expand_path('../slug_generator/russian.yml', __FILE__)
 
-    Cyrillizer.alphabet = Rails.root.join('lib', 'cyrillizer', 'russian.yml')
-
-    def initialize(uniqueness_checker:, validation_checker: nil, separator: "-")
+    def initialize(uniqueness_checker:, validation_checker: nil, generator: nil, separator: "-")
+      @generator          = generator || lambda { SecureRandom.hex(3) }
       @separator          = separator
       @uniqueness_checker = uniqueness_checker
       @validation_checker = validation_checker || lambda { |s| (s.to_s != "") && (s.size > 5) }
-      fail ArgumentError, "uniqueness_checker must be a lambda / Proc" unless @uniqueness_checker.is_a? Proc
-      fail ArgumentError, "validation_checker must be a lambda / Proc" unless @validation_checker.is_a? Proc
+      fail ArgumentError, "generator must be a lambda / Proc. We expect somehting like `lambda { SecureRandom.hex(3) }` (which is default)." unless @generator.is_a? Proc
+      fail ArgumentError, "uniqueness_checker must be a lambda / Proc. We expect somehting like `lambda { |string| User.exists?(slug: string) }`." unless @uniqueness_checker.is_a? Proc
+      fail ArgumentError, "validation_checker must be a lambda / Proc. We expect somehting like `lambda { |string| string.size > 5 }.`" unless @validation_checker.is_a? Proc
       fail ArgumentError, "provided separator (#{separator}) is too long" if separator.to_s.size > 2
     end
 
@@ -27,7 +26,7 @@ module Integral
     end
 
 
-    # private
+    private
 
     def unique?(string)
       @uniqueness_checker.call string
@@ -41,31 +40,21 @@ module Integral
       valid?(string) && unique?(string)
     end
 
-
     def calculate_slug_with_no_text_input
       loop do
-        candidate = random_only
+        candidate = @generator.call
         break candidate if slug_ok?(candidate)
       end
     end
-
 
     def calculate_slug_from_username(full_name)
       slugified = slugify_full_name(full_name)
       return slugified if slug_ok?(slugified)
 
       loop do
-        candidate = random_with_text(slugified)
+        candidate = [text, @generator.call].join(@separator)
         break candidate if slug_ok?(candidate)
       end
-    end
-
-    def random_with_text(text)
-      [text, SecureRandom.hex(3)].join("-")
-    end
-
-    def random_only
-      SecureRandom.hex(3)
     end
 
     def slugify_full_name(text)

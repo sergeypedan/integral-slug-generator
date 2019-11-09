@@ -3,14 +3,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "integral/slug_generator/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "integral-slug_generator"
-  spec.version       = Integral::SlugGenerator::VERSION
-  spec.authors       = ["Sergey Pedan"]
-  spec.email         = ["sergey.pedan@gmail.com"]
-
-  spec.summary       = %q{Generates a DB-unique slug for a given table}
-  spec.description   = %q{Checks existence of a record with a slug and re-generates until succeess}
-  spec.homepage      = "https://github.com/sergeypedan/integral-slug-generator"
+  spec.name        = "integral-slug_generator"
+  spec.version     = Integral::SlugGenerator::VERSION
+  spec.authors     = ["Sergey Pedan"]
+  spec.email       = ["sergey.pedan@gmail.com"]
+  spec.summary     = %q{Generates a DB-unique & validated slug}
+  spec.description = %q{Checks existence of a record with a slug and re-generates until succeess}
+  spec.homepage    = "https://github.com/sergeypedan/integral-slug-generator"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
@@ -30,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "rspec"
 
-  spec.add_runtime_dependency "i18n"
+  spec.add_runtime_dependency "cyrillizer"
 end

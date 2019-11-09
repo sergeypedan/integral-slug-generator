@@ -1,5 +1,5 @@
 module Integral
-  module SlugGenerator
+  class SlugGenerator
     VERSION = "0.1.0"
   end
 end
